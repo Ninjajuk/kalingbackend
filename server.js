@@ -1,11 +1,13 @@
 const express =require('express');
 const { router: ordersRouter }  = require('./router/Order');
 const cors = require('cors');
+require('dotenv').config();
 
 const app=express()
 const port=3030
+// const databaseUrl = process.env.DATABASE_URL;
 
-// const url='mongodb+srv://samsu:ninjaking@cluster0.hne9oli.mongodb.net/products?retryWrites=true&w=majority'
+
 
 //middlewares
 app.use(express.json());// to parse req.body

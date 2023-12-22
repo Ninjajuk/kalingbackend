@@ -1,12 +1,13 @@
+require('dotenv').config();
 const express =require('express');
 const mongoose = require('mongoose');
 const {  router:ordersRouter }  = require('./router/Order');
 const {  router:productrouter }  = require('./router/product');
 const cors = require('cors');
-require('dotenv').config();
+
 
 const app=express()
-const port=3030
+const PORT=process.env.PORT || 5050
 const databaseUrl = process.env.DATABASE_URL;
 
 
@@ -39,6 +40,6 @@ app.get('/',(req,resp)=>{
     resp.send('<h1>Hi Samsu</h1>')
   })
 
-app.listen(port,()=>{
-    console.log(`Server is running at port ${port}`)
+app.listen(PORT,()=>{
+    console.log(`Server is running at port ${PORT}`)
   })

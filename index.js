@@ -3,6 +3,7 @@ const express =require('express');
 const mongoose = require('mongoose');
 const {  router:ordersRouter }  = require('./router/Order');
 const {  router:productrouter }  = require('./router/product');
+const {  router:authRoute }  = require('./router/auth');
 const cors = require('cors');
 
 
@@ -15,6 +16,7 @@ const databaseUrl = process.env.DATABASE_URL;
 //middlewares
 app.use(express.json());// to parse req.body 
 app.use(cors());
+app.use('/auth',authRoute)
 app.use('/orders', ordersRouter);
 app.use('/products', productrouter);
 

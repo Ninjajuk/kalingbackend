@@ -5,7 +5,6 @@ const { sendMail, invoiceTemplate,NewOrderReceivedEmail } = require('../services
 exports.FetchOrders = async (req, res) => {
    try {
       const order = { id: '123', totalItems: 5, totalAmount: 100 };
-
       // Call the function to send email
       const info = await sendMail({
          to: 'biosamsuddin@gmail.com',

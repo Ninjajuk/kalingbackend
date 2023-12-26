@@ -1,32 +1,45 @@
-require('dotenv').config();
-const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt'); 
+const {generateOTP}=require('../services/helper')
+const User = require('../model/UserSchema');
 
-const transporter=nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // upgrade later with STARTTLS
-    auth: {
-      user: process.env.EMAIL,
-      pass: passKEY_EMAIL,
-    },
-  });
+exports.createUser=async(req,resp)=>{
 
+const{email,phone,password,role,addresses,resetPasswordToken}=req.body
 
-  const mailOptions = {
-    from: 'codewizardsam@gmail.com',
-    to: 'biosamsuddin@gmail.com',
-    subject: 'Order details',
-    text: 'Hi Samsu .Please find the order details below-'
-  };
+    try {
 
-  exports.sendMail = async function ({to, subject, text, html}){
-    let info = await transporter.sendMail({
-        from: '"E-commerce" <codewizardsam@gmail.com>', // sender address
-        to,
-        subject,
-        text,
-        html
-      });
-    return info;  
+    // Check if user already exists
+    const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
+    if (existingUser) {
+      return resp.status(409).json({ error: 'Email or phone number already in use.' });
+    }
+    console.log('Received registration request:', email,phone,password,role,addresses,resetPasswordToken);
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user with the hashed password
+    let newuser = new User({ ...req.body, password: hashedPassword });
+    console.log('Before saving new user:', newuser);
+  
+    await newuser.save();
+    console.log('User saved successfully.');
+    resp.json({ message: 'User registered successfully.' });
+    
+    } catch (error) {
+        console.error('Error registering user:', error);
+        resp.status(500).json({ error: 'Internal Server Error' });
+    }
+
 }
 
+exports.generateOTP=async(req,resp)=>{
+    const userId = req.params.userId;
+    try {
+
+    // const user = await User.findById(userId);
+    } catch (error) {
+        
+    }
+}

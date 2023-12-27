@@ -10,7 +10,6 @@ const otpStore = new Map();
 
 exports.createUser = async (req, resp) => {
     const { email, phone, password, role, addresses, resetPasswordToken } = req.body;
-  
     try {
       // Check if user already exists
       const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
@@ -35,6 +34,15 @@ exports.createUser = async (req, resp) => {
       resp.status(500).json({ error: 'Internal Server Error', details: error.message });
     }
   };
+
+exports.getUserbyEmail=async(req,res)=>{
+  
+  try {
+    
+  } catch (error) {
+    
+  }
+}
 
 exports.generateOTP=async(req,resp)=>{
     // Generate a random 6-digit OTP

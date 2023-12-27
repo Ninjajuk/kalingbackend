@@ -1,4 +1,6 @@
 
+require('dotenv').config();
+const passport = require('passport');
 const nodemailer = require('nodemailer');
 
 const transporter=nodemailer.createTransport({
@@ -6,12 +8,28 @@ const transporter=nodemailer.createTransport({
     port: 587,
     secure: false, // upgrade later with STARTTLS
     auth: {
-      user: 'codewizardsam@gmail.com',
-      pass: 'hybmfjwrliozxybx',
+      user: process.env.EMAIL,
+      pass: process.env.PASSKEY_EMAIL,
     },
   });
+  module.exports = transporter;
 
 
+  exports.isAuth = (req, res, done) => {
+    return passport.authenticate('jwt');
+  };
+  
+  exports.sanitizeUser = (user) => {
+    return { id: user.id, role: user.role };
+  };
+  
+  exports.cookieExtractor = function (req) {
+    let token = null;
+    if (req && req.cookies) {
+      token = req.cookies['jwt'];
+    }
+    return token;
+  };
 
   exports.sendMail = async function ({ to, subject, text, html }) {
     try {

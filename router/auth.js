@@ -8,7 +8,7 @@ router.post('/signup',createUser )
        .get('/send-otp/:userId',generateOTP)
        .get('/user',async(req,resp)=>{
         try {
-            const doc=await User.find() 
+            const doc=await User.find({}) 
             resp.json(doc)
             console.log(doc)
         } catch (error) {

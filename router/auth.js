@@ -5,11 +5,11 @@ const User = require('../model/UserSchema');
 const router = express.Router();
 
 router.post('/signup',createUser )
-      .get('/login',getUserbyEmail)
+      .get('/login',getUserbyId)
        .get('/send-otp/:email',generateOTP)
        .post('/verify-otp',verifyOtp)
        .get('/user',getAllUser)
-       .get('/user/:email',getUserbyId)
+      //  .get('/user/:email',getUserbyId)
 
 
 exports.router = router;

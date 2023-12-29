@@ -117,11 +117,13 @@ exports.getAllUser=async(req,resp)=>{
   }
 }
 
+
 exports.getUserbyId = async (req, resp) => {
-  const email=req.params.email
+  const { email } = req.body;
+
   try {
-    const user = await User.findOne({Email:email});
-    resp.status(201).json(user)
+    const user = await User.findOne({ email: email });
+
     if (user) {
       resp.status(200).json(user);
     } else {

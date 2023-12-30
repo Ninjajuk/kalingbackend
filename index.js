@@ -22,12 +22,6 @@ app.use('/orders', ordersRouter);
 app.use('/products', productrouter);
 
 
-
-// async function main() {
-//   await mongoose.connect(process.env.MONGODB_URL);
-//   console.log('database connected');
-// }
-
 async function ConnectToDb(){
   try{
     await mongoose.connect(process.env.DATABASE_URL)

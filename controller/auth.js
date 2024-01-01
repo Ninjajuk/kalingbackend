@@ -93,12 +93,10 @@ exports.verifyOtp=async(req,resp)=>{
   if (userOTP === storedOTP) {
 
     // OTP is valid Generate and sign JWT token
-const token = jwt.sign({ email }, process.env.SECRET_KEY_JWT, { expiresIn: '1h' }); 
+// const token = jwt.sign({ email }, process.env.SECRET_KEY_JWT, { expiresIn: '1h' }); 
 
   // Saved token in the user's document
   await User.findOneAndUpdate({ email }, { $set: { token } });
-
-
     resp.status(200).json({ message: 'OTP verification successful' });
   } else {
     resp.status(400).json({ error: 'Invalid OTP' });
@@ -118,17 +116,24 @@ exports.getAllUser=async(req,resp)=>{
 }
 
 exports.getUserbyId = async (req, resp) => {
-  const email=req.params.email
+  const { email, password } = req.body;
   try {
-    const user = await User.findOne({Email:email});
-    resp.status(201).json(user)
-    if (user) {
-      resp.status(200).json(user);
+    // Check if user is present or not
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      resp.status(404).json({ error: "User not found.Please register!" });
     } else {
-      resp.status(404).json({ error: 'User not found' });
+      // Compare the provided password with the hashed password stored in the database
+      const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+      if (isPasswordMatch) {
+        resp.status(200).json({ success: "Logged in successfully", user });
+      } else {
+        resp.status(401).json({ error: "Incorrect password" });
+      }
     }
   } catch (error) {
-    console.log('Error finding user:', error);
-    resp.status(500).json({ error: 'Internal Server Error' });
+    console.log("Error finding user:", error);
+    resp.status(500).json({ error: "Internal Server Error" });
   }
 };

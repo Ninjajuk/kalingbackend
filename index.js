@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const {  router:ordersRouter }  = require('./router/Order');
 const {  router:productrouter }  = require('./router/product');
 const {  router:authRoute }  = require('./router/auth');
-
 const cors = require('cors');
 
 

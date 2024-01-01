@@ -5,7 +5,7 @@ const User = require('../model/UserSchema');
 const router = express.Router();
 
 router.post('/signup',createUser )
-      .get('/login',getUserbyId)
+      .post('/login',getUserbyId)
        .get('/send-otp/:email',generateOTP)
        .post('/verify-otp',verifyOtp)
        .get('/user',getAllUser)

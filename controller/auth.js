@@ -50,17 +50,17 @@ function generateOTP() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-const userEmail = req.params.email;
+const {email} = req.body;
   // Generate OTP
   const otp = generateOTP();
-
+console.log(email,otp)
   // Save OTP in the store
-  otpStore.set(userEmail, otp);
+  otpStore.set(email, otp);
 
   // Configure email options
   const mailOptions = {
     from: 'codewizardsam@gmail.com', 
-    to: userEmail,
+    to: email,
     subject: 'OTP Verification',
     text: `Your OTP for email verification is: ${otp}`,
   };

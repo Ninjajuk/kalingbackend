@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post('/signup',createUser )
       .post('/login',getUserbyId)
-       .get('/send-otp/:email',generateOTP)
+       .post('/send-otp/',generateOTP)
        .post('/verify-otp',verifyOtp)
        .get('/user',getAllUser)
       //  .get('/user/:email',getUserbyId)

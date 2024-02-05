@@ -48,7 +48,7 @@ console.log('Admin Email sent: ', adminEmailResult);
     const order = new Order(req.body);
     
     // Fetch the admin's email
-    const admin = await Admin.findOne(); // You need to adjust this based on your actual data model
+    const admin = await Admin.findOne(); 
     const adminEmail = admin.email;
   
     // Update stocks

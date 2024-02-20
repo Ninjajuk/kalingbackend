@@ -24,17 +24,83 @@ exports.CreateProduct = async (req, resp) => {
         resp.status(500).json({ error: 'Server Error' });
     }
 };
-
-exports.FetchallProducts=async(req,resp)=>{
+exports.FetchallProducts = async (req, res) => {
     try {
-        const pro=await Product.find()
-        pro.length >0 ? resp.status(200).json(pro):resp.status(200).json('No products found Please add')
-        // pro.length > 0 ? resp.status(200).json(pro) : resp.status(404).json({ error: 'No products found. Please add.' });
-        
+        let { index,limit, offset, search } = req.query;
+
+       
+        // limit = parseInt(limit) || 12;   // Default limit to 12 if not provided
+        offset = parseInt(index) || 0;  
+
+        let itemsPerPage= parseInt(limit) || 12; 
+        let pageNumber=parseInt(index) || 0; 
+
+        let query = {};
+
+        // If search parameter is provided, add it to the query
+        if (search) {
+            const searchRegex = new RegExp(search, 'i');
+            query = { name: searchRegex };
+        }
+
+        // Find all products if limit is set to -1
+        if (itemsPerPage === -1) {
+            const products = await Product.find(query);
+            res.status(200).json({ products });
+            return;
+        }
+
+        const products = await Product.find(query).limit(itemsPerPage).skip(pageNumber);
+
+        // Check if there are more products
+        const totalProductsCount = await Product.countDocuments(query);
+        const hasMore = totalProductsCount > offset + limit;
+
+        res.status(200).json({ products, hasMore });
     } catch (error) {
-        resp.status(500).json({error:'Server Error'})
+        console.error('Error fetching products:', error);
+        res.status(500).json({ error: 'Server Error' });
     }
-}
+};
+
+// exports.FetchallProducts = async (req, resp) => {
+//     try {
+//         let query = {};
+//         let { limit,offset, skip, search } = req.query;
+
+//         // If search parameter is provided, construct a regex pattern to match product names
+//         if (search) {
+//             const searchRegex = new RegExp(search, 'i');
+//             query = { name: searchRegex };
+//         }
+
+//         // Convert limit and skip to integers
+//         limit = parseInt(limit) || 12; // Default to 12 products per request
+//         skip = parseInt(skip) || 0;
+//         offset = parseInt(offset) || 0; // Change 'skip' to 'offset'
+
+//         // const pro = await Product.find(query).limit(limit).skip(skip);
+//         const products = await Product.find(query).limit(limit).skip(offset); // Change 'skip' to 'offset'
+
+//         // Check if there are more products
+//         const totalProductsCount = await Product.countDocuments(query);
+//         const hasMore = totalProductsCount > offset + limit;
+
+        
+//         if (pro.length > 0) {
+//             resp.status(200).json({ products, hasMore });
+//         } else {
+//             resp.status(200).json('No products found. Please add.');
+//             // Alternatively, you can return a 404 error if no products found:
+//             // resp.status(404).json({ error: 'No products found. Please add.' });
+//         }
+//     } catch (error) {
+//         resp.status(500).json({ error: 'Server Error' });
+//     }
+// }
+
+
+
 
 
 //Update Product request

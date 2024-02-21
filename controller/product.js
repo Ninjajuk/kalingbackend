@@ -24,16 +24,14 @@ exports.CreateProduct = async (req, resp) => {
         resp.status(500).json({ error: 'Server Error' });
     }
 };
+
 exports.FetchallProducts = async (req, res) => {
     try {
-        let { index,limit, offset, search } = req.query;
+        let { skip, limit, search ,all} = req.query;
 
-       
-        // limit = parseInt(limit) || 12;   // Default limit to 12 if not provided
-        offset = parseInt(index) || 0;  
-
-        let itemsPerPage= parseInt(limit) || 12; 
-        let pageNumber=parseInt(index) || 0; 
+        // Set default values for skip and limit if not provided
+        skip = parseInt(skip) || 0;
+        limit = parseInt(limit) || 12;
 
         let query = {};
 
@@ -43,25 +41,33 @@ exports.FetchallProducts = async (req, res) => {
             query = { name: searchRegex };
         }
 
-        // Find all products if limit is set to -1
-        if (itemsPerPage === -1) {
-            const products = await Product.find(query);
-            res.status(200).json({ products });
-            return;
-        }
 
-        const products = await Product.find(query).limit(itemsPerPage).skip(pageNumber);
+                // If 'all' parameter is provided and set to true, fetch all products
+                if (all === 'true') {
+                    const products = await Product.find(query);
+                    res.status(200).json({ products });
+                    console.log(products.length)
+                    return; // return early to prevent further execution
+                }
+
+console.log(limit)
+console.log(skip)
+        // Find products based on skip and limit
+        const products = await Product.find(query)
+            .limit(limit)
+            .skip(skip); 
 
         // Check if there are more products
         const totalProductsCount = await Product.countDocuments(query);
-        const hasMore = totalProductsCount > offset + limit;
+        const hasMore = (skip + limit) < totalProductsCount;
 
         res.status(200).json({ products, hasMore });
     } catch (error) {
         console.error('Error fetching products:', error);
-        res.status(500).json({ error: 'Server Error' });
+        res.status(500).json({ error: error.message || 'Server Error' });
     }
 };
+
 
 // exports.FetchallProducts = async (req, resp) => {
 //     try {

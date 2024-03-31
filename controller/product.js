@@ -25,16 +25,88 @@ exports.CreateProduct = async (req, resp) => {
     }
 };
 
-exports.FetchallProducts=async(req,resp)=>{
+exports.FetchallProducts = async (req, res) => {
     try {
-        const pro=await Product.find()
-        pro.length >0 ? resp.status(200).json(pro):resp.status(200).json('No products found Please add')
-        // pro.length > 0 ? resp.status(200).json(pro) : resp.status(404).json({ error: 'No products found. Please add.' });
-        
+        let { skip, limit, search ,all} = req.query;
+
+        // Set default values for skip and limit if not provided
+        skip = parseInt(skip) || 0;
+        limit = parseInt(limit) || 12;
+
+        let query = {};
+
+        // If search parameter is provided, add it to the query
+        if (search) {
+            const searchRegex = new RegExp(search, 'i');
+            query = { name: searchRegex };
+        }
+
+
+                // If 'all' parameter is provided and set to true, fetch all products
+                if (all === 'true') {
+                    const products = await Product.find(query);
+                    res.status(200).json({ products });
+                    // console.log(products.length)
+                    return; // return early to prevent further execution
+                }
+
+// console.log(limit)
+// console.log(skip)
+        // Find products based on skip and limit
+        const products = await Product.find(query)
+            .limit(limit)
+            .skip(skip); 
+
+        // Check if there are more products
+        const totalProductsCount = await Product.countDocuments(query);
+        const hasMore = (skip + limit) < totalProductsCount;
+
+        res.status(200).json({ products, hasMore });
     } catch (error) {
-        resp.status(500).json({error:'Server Error'})
+        console.error('Error fetching products:', error);
+        res.status(500).json({ error: error.message || 'Server Error' });
     }
-}
+};
+
+
+// exports.FetchallProducts = async (req, resp) => {
+//     try {
+//         let query = {};
+//         let { limit,offset, skip, search } = req.query;
+
+//         // If search parameter is provided, construct a regex pattern to match product names
+//         if (search) {
+//             const searchRegex = new RegExp(search, 'i');
+//             query = { name: searchRegex };
+//         }
+
+//         // Convert limit and skip to integers
+//         limit = parseInt(limit) || 12; // Default to 12 products per request
+//         skip = parseInt(skip) || 0;
+//         offset = parseInt(offset) || 0; // Change 'skip' to 'offset'
+
+//         // const pro = await Product.find(query).limit(limit).skip(skip);
+//         const products = await Product.find(query).limit(limit).skip(offset); // Change 'skip' to 'offset'
+
+//         // Check if there are more products
+//         const totalProductsCount = await Product.countDocuments(query);
+//         const hasMore = totalProductsCount > offset + limit;
+
+        
+//         if (pro.length > 0) {
+//             resp.status(200).json({ products, hasMore });
+//         } else {
+//             resp.status(200).json('No products found. Please add.');
+//             // Alternatively, you can return a 404 error if no products found:
+//             // resp.status(404).json({ error: 'No products found. Please add.' });
+//         }
+//     } catch (error) {
+//         resp.status(500).json({ error: 'Server Error' });
+//     }
+// }
+
+
+
 
 
 //Update Product request

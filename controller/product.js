@@ -46,12 +46,12 @@ exports.FetchallProducts = async (req, res) => {
                 if (all === 'true') {
                     const products = await Product.find(query);
                     res.status(200).json({ products });
-                    console.log(products.length)
+                    // console.log(products.length)
                     return; // return early to prevent further execution
                 }
 
-console.log(limit)
-console.log(skip)
+// console.log(limit)
+// console.log(skip)
         // Find products based on skip and limit
         const products = await Product.find(query)
             .limit(limit)

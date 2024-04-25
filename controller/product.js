@@ -21,7 +21,7 @@ exports.CreateProduct = async (req, resp) => {
         }
      
     } catch (error) {
-        resp.status(500).json({ error: 'Server Error' });
+        resp.status(500).json({ error: 'Server Error please' });
     }
 };
 
@@ -207,22 +207,30 @@ exports.SearchProducts = async (req, res) => {
     }
 };
 
-  // app.post('/addproduct', async (req, resp) => {
-  //   try {
-  //     console.log('Request received:', req.body);
-  //     const { shopName, shopCategory, ownerName, contacts } = req.body;
-  //     console.log('Creating new product:', shopName, shopCategory, ownerName, contacts);
-  //     const newProduct = new Shop({ shopName, shopCategory, ownerName, contacts });
-  //     console.log('New product created:', newProduct);
-  //     await newProduct.save();
-  //     console.log('Product saved successfully');
+//   app.post('/addproduct', async (req, resp) => {
+//     try {
+//       console.log('Request received:', req.body);
+//       const { title, description, price, cuttedprice,        discount,
+//       category,
+//       brand,
+//       units,
+//       stock,
+//       rating,
+//       highlight1,
+//       highlight2,
+//       highlight3, } = req.body;
+//       console.log('Creating new product:',  title, description, price, cuttedprice,discount,category,brand,units,stock,rating,highlight1,highlight2,highlight3,);
+//       const newProduct = new Shop({ title, description, price, cuttedprice,discount,category,brand,units,stock,rating,highlight1,highlight2,highlight3, });
+//       console.log('New product created:', newProduct);
+//       await newProduct.save();
+//       console.log('Product saved successfully');
   
-  //     resp.status(201).json({ message: 'Product added successfully' });
-  //   } catch (error) {
-  //     console.error('Error adding product:', error);
-  //     resp.status(500).json({ error: 'Internal Server Error' });
-  //   }
-  // });
+//       resp.status(201).json({ message: 'Product added successfully' });
+//     } catch (error) {
+//       console.error('Error adding product:', error);
+//       resp.status(500).json({ error: 'Internal Server Error' });
+//     }
+//   });
   
   
   // app.get('/products', async(req,res)=>{

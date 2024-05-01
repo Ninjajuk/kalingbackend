@@ -27,7 +27,8 @@ exports.createUser = async (req, resp) => {
  
       await newuser.save();
       console.log('User saved successfully.');
-      resp.json({ message: 'User registered successfully.' });
+      resp.status(201).json({ message: 'User registered successfully.', user: newuser }); // Changed from resp.json() to resp.status(201).json()
+
   
     } catch (error) {
       console.error('Error registering user:', error);

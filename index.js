@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const {  router:ordersRouter }  = require('./router/Order');
 const {  router:productrouter }  = require('./router/product');
 const {  router:authRoute }  = require('./router/auth');
+const {  router:cartRoute }  = require('./router/Cart');
 const cors = require('cors');
 
 
@@ -17,6 +18,8 @@ const databaseUrl = process.env.DATABASE_URL;
 app.use(express.json());// to parse req.body 
 app.use(cors());
 app.use('/auth',authRoute)
+app.use('/cart',  cartRoute);
+// app.use('/cart', isAuth(), cartRoute);
 app.use('/orders', ordersRouter);
 app.use('/products', productrouter);
 

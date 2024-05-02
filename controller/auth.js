@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt'); 
-const {generateOTP}=require('../services/helper')
+const {generateOTP, generateSignature}=require('../services/helper')
 const User = require('../model/UserSchema');
 const transporter = require('../services/common');
 
@@ -18,16 +18,33 @@ exports.createUser = async (req, resp) => {
       }
   
       console.log('Received registration request:',name, email, phone, password, role, addresses, resetPasswordToken);
-      // Hash the password
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10);       // Hash the password
   
-      // Create a new user with the hashed password
-      let newuser = new User({name, email, phone, password: hashedPassword, role, addresses, resetPasswordToken });
-      console.log('Before saving new user:', newuser);
+
+      let newuser = new User({name, email, phone, password: hashedPassword, role, addresses, resetPasswordToken });    // Create a new user with the hashed password
+      // console.log('Before saving new user:', newuser);
+      
+          // create token
+    const payload = {
+      name, email, phone, password: hashedPassword, role, addresses
+    }
+
+    // tokens expiry time set to 5m
+    const expiryTime = '5m'
+
+    const token = await generateSignature(payload, expiryTime);
  
       await newuser.save();
-      console.log('User saved successfully.');
-      resp.status(201).json({ message: 'User registered successfully.', user: newuser }); // Changed from resp.json() to resp.status(201).json()
+      console.log('User saved successfully.')
+
+              // Set the token as a cookie
+              resp.cookie('token', token, {
+                httpOnly: true,
+                // maxAge: 5 * 60 * 1000, // 5 minutes in milliseconds
+                expires: new Date(Date.now() + 3600000)
+                // secure: process.env.NODE_ENV === 'production' // Set secure to true in production
+            });
+      resp.status(201).json({ message: 'User registered successfully.', user: newuser,token:token }); // Changed from resp.json() to resp.status(201).json()
 
   
     } catch (error) {
@@ -36,14 +53,28 @@ exports.createUser = async (req, resp) => {
     }
   };
 
-exports.getUserbyEmail=async(req,res)=>{
+  exports.getUserbyId = async (req, resp) => {
+    const { email, password } = req.body;
+    try {
+      // Check if user is present or not
+      const user = await User.findOne({ email: email });
+      if (!user) {
+        resp.status(404).json({ error: "User not found.Please register!" });
+      } else {
+        // Compare the provided password with the hashed password stored in the database
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
   
-  try {
-    
-  } catch (error) {
-    
-  }
-}
+        if (isPasswordMatch) {
+          resp.status(200).json({ success: "Logged in successfully", user });
+        } else {
+          resp.status(401).json({ error: "Incorrect password" });
+        }
+      }
+    } catch (error) {
+      console.log("Error finding user:", error);
+      resp.status(500).json({ error: "Internal Server Error" });
+    }
+  };
 
 exports.generateOTP=async(req,resp)=>{
     // Generate a random 6-digit OTP
@@ -116,25 +147,3 @@ exports.getAllUser=async(req,resp)=>{
   }
 }
 
-exports.getUserbyId = async (req, resp) => {
-  const { email, password } = req.body;
-  try {
-    // Check if user is present or not
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      resp.status(404).json({ error: "User not found.Please register!" });
-    } else {
-      // Compare the provided password with the hashed password stored in the database
-      const isPasswordMatch = await bcrypt.compare(password, user.password);
-
-      if (isPasswordMatch) {
-        resp.status(200).json({ success: "Logged in successfully", user });
-      } else {
-        resp.status(401).json({ error: "Incorrect password" });
-      }
-    }
-  } catch (error) {
-    console.log("Error finding user:", error);
-    resp.status(500).json({ error: "Internal Server Error" });
-  }
-};

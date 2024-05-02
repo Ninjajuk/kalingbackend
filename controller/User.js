@@ -1,4 +1,4 @@
-// const { Category } = require('../model/Category');
+
 const { User } = require('../model/UserSchema');
 
 exports.fetchUserById = async (req, res) => {

@@ -1,14 +1,14 @@
 
 const express = require('express');
-const {createUser,getUserbyEmail,getAllUser,getUserbyId,generateOTP,verifyOtp}=require('../controller/auth')
+const {createUser,loginUSer,checkAuth,}=require('../controller/auth')
 const User = require('../model/UserSchema');
+const passport = require('passport');
 const router = express.Router();
 
-router.post('/signup',createUser )
-      .post('/login',getUserbyId)
-       .post('/send-otp/',generateOTP)
-       .post('/verify-otp',verifyOtp)
-       .get('/user',getAllUser)
+router.post("/signup", createUser)
+      // .post("/login", passport.authenticate("local"), loginUSer)
+      // .get('/check',passport.authenticate('jwt'), checkAuth)
+
 
 
 

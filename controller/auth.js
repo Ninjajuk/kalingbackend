@@ -23,10 +23,14 @@ exports.createUser = async (req, resp) => {
   
       // Create a new user with the hashed password
       let newuser = new User({name, email, phone, password: hashedPassword, role, addresses, resetPasswordToken });
-      console.log('Before saving new user:', newuser);
+      // console.log('Before saving new user:', newuser);
  
       await newuser.save();
-      console.log('User saved successfully.');
+// const payLoad={
+//   name, email, phone
+// }
+//       let token= await generateSignature(payLoad,)
+      // console.log('User saved successfully.');
       resp.status(201).json({ message: 'User registered successfully.', user: newuser }); // Changed from resp.json() to resp.status(201).json()
 
   
@@ -36,14 +40,28 @@ exports.createUser = async (req, resp) => {
     }
   };
 
-exports.getUserbyEmail=async(req,res)=>{
+  exports.loginUser = async (req, resp) => {
+    const { email, password } = req.body;
+    try {
+      // Check if user is present or not
+      const user = await User.findOne({ email: email });
+      if (!user) {
+        resp.status(404).json({ error: "User not found.Please register!" });
+      } else {
+        // Compare the provided password with the hashed password stored in the database
+        const isPasswordMatch = await bcrypt.compare(password, user.password);
   
-  try {
-    
-  } catch (error) {
-    
-  }
-}
+        if (isPasswordMatch) {
+          resp.status(200).json({ success: "Logged in successfully", user });
+        } else {
+          resp.status(401).json({ error: "Incorrect password" });
+        }
+      }
+    } catch (error) {
+      console.log("Error finding user:", error);
+      resp.status(500).json({ error: "Internal Server Error" });
+    }
+  };
 
 exports.generateOTP=async(req,resp)=>{
     // Generate a random 6-digit OTP

@@ -1,9 +1,10 @@
 const express=require('express')
-const {CreateProduct,FetchallProducts,editProduct,removeproduct,GetProductsByCategory,SearchProducts}= require('../controller/product')
+const {CreateProduct,FetchallProducts,fetchProductById,editProduct,removeproduct,GetProductsByCategory,SearchProducts}= require('../controller/product')
 const router=express.Router()
 
 
 router.get('/',FetchallProducts)
+    .get('/:productId',fetchProductById)
     .post('/addproduct',CreateProduct)
     .put('/editproduct/:productId',editProduct)
     .delete('/deleteproduct/:productId',removeproduct)

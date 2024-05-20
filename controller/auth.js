@@ -1,8 +1,10 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt'); 
 const {generateOTP}=require('../services/helper')
+const {sendMail}=require('../services/common')
 const User = require('../model/UserSchema');
 const transporter = require('../services/common');
+const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
 
 // Store OTPs for verification
@@ -52,7 +54,13 @@ exports.createUser = async (req, resp) => {
         const isPasswordMatch = await bcrypt.compare(password, user.password);
   
         if (isPasswordMatch) {
-          resp.status(200).json({ success: "Logged in successfully", user });
+                // If authentication is successful, generate JWT token
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1d' }); 
+
+      // Set the token in a cookie
+      resp.cookie('token', token, { expires:new Date(Date.now() + 25892000000),httpOnly: true, });
+
+      return resp.status(200).json({ success: "Logged in successfully", user,token });
         } else {
           resp.status(401).json({ error: "Incorrect password" });
         }
@@ -62,6 +70,82 @@ exports.createUser = async (req, resp) => {
       resp.status(500).json({ error: "Internal Server Error" });
     }
   };
+  exports.checkAuth = async (req, res) => {
+    if (req.user) {
+      res.json(req.user,);
+    } else {
+      res.sendStatus(401);
+    }
+  };
+
+  exports.logout = async (req, res) => {
+    res
+      .cookie('jwt', null, {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+      })
+      .sendStatus(200)
+  };
+
+  exports.resetPasswordRequest = async (req, res) => {
+    try {
+      const email = req.body.email;
+      const user = await User.findOne({ email });
+  
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' }); 
+      user.resetPasswordToken = token;
+      user.resetPasswordExpires = Date.now() + 3600000; // Token expires in 1 hour
+      await user.save();
+  
+      const resetPageLink = `http://localhost:3000/reset-password?token=${token}&email=${email}`;
+      const subject = 'Reset password for YingKiong Store';
+      const html = `<p>Click <a href='${resetPageLink}'>here</a> to reset your password</p>`;
+  
+      const response = await transporter.sendMail({ to: email, subject, html });
+      res.status(200).json({response,message:'Token send to email successfully '});
+    } catch (error) {
+      console.error("Error requesting password reset:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  };
+  
+  exports.resetPassword = async (req, res) => {
+    try {
+      const { email, password, token } = req.body;
+      const user = await User.findOne({ email, resetPasswordToken: token });
+      if (!user) {
+        // If no user is found with the given email and token
+        return res.status(404).json({ error: "Invalid token" });
+      }
+  
+      // Check if token has expired
+      if (user.resetPasswordExpires < Date.now()) {
+        // If token has expired
+        return res.status(401).json({ error: "Expired token" });
+      }
+  
+      const hashedPassword = await bcrypt.hash(password, 10);
+      user.password = hashedPassword;
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+  
+      const subject = 'Password successfully reset for YingKiong Store';
+      const html = `<p>Your password has been successfully reset</p>`;
+      await transporter.sendMail({ to: email, subject, html });
+  
+      res.json({ message: "Password reset successfully" });
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  };
+  
+
 
 exports.generateOTP=async(req,resp)=>{
     // Generate a random 6-digit OTP

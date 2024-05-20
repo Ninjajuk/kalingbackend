@@ -1,32 +1,65 @@
 const { Cart } = require('../model/CartSchema');
+const jwt = require('jsonwebtoken');
+const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
 exports.fetchCartByUser = async (req, res) => {
-
-    // Check if req.user is defined
-    // if (!req.user) {
-    //     return res.status(401).json({ error: "User not authenticated" });
-    //   }
-    const { id } = req.user;        // Destructure id from req.user
   try {
-    const cartItems = await Cart.find({ user: id }).populate('product');
+    // Extract token from the Authorization header
+    const authHeader = req.headers.authorization;
+    // console.log('Authorization Header:', req.headers.authorization);
 
+    if (!authHeader) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    const userId = decoded.userId;
+
+    // Fetch cart items for the user
+    const cartItems = await Cart.find({ user: userId }).populate('product');
     res.status(200).json(cartItems);
   } catch (err) {
-    res.status(400).json(err);
+    console.error("Error fetching cart items:", err);
+    res.status(400).json({ error: "Failed to fetch cart items" });
   }
 };
 
 exports.addToCart = async (req, res) => {
-  const {id} = req.user;
-  const cart = new Cart({...req.body,user:id});
   try {
-    const doc = await cart.save();
-    const result = await doc.populate('product');
-    res.status(201).json(result);
+    // Access token from request cookies
+    // const token = req.cookies.token;
+    // console.log(token)
+
+    // if (!token) {
+    //   return res.status(401).json({ error: "Unauthorized" });
+    // }
+
+    // // Verify the token
+    // const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY); // Use the same secret key used for signing the token in loginUser
+
+    // // Assuming decoded contains userId
+    // const userId = decoded.userId;
+    // Now you can proceed to add to cart using userId
+    const { quantity, product: productId,user} = req.body;
+  
+// console.log(user)
+    const cart = new Cart({ quantity, product: productId, user,});
+    const savedCart = await cart.save();
+    const populatedCart = await savedCart.populate('product')
+    
+    res.status(201).json(populatedCart);
   } catch (err) {
-    res.status(400).json(err);
+    console.error("Error adding to cart:", err);
+    res.status(400).json({ error: "Failed to add to cart" });
   }
 };
+
 
 exports.deleteFromCart = async (req, res) => {
     const { id } = req.params;

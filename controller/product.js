@@ -69,6 +69,22 @@ exports.FetchallProducts = async (req, res) => {
 };
 
 
+
+exports.fetchProductById = async (req, res) => {
+    try {
+        const { productId } = req.params;
+    
+        const productDetails = await Product.findById(productId);
+        if (!productDetails) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+        res.status(200).json(productDetails);
+    } catch (error) {
+        console.error('Error retrieving products by ID:', error);
+        res.status(500).json({ error: 'Server Error' });
+    }
+}
+
 // exports.FetchallProducts = async (req, resp) => {
 //     try {
 //         let query = {};

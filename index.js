@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express =require('express');
 const mongoose = require('mongoose');
+const cookieParser = require('cookie-parser');
 const {  router:ordersRouter }  = require('./router/Order');
 const {  router:productrouter }  = require('./router/product');
 const {  router:authRoute }  = require('./router/auth');
@@ -17,6 +18,12 @@ const databaseUrl = process.env.DATABASE_URL;
 //middlewares
 app.use(express.json());// to parse req.body 
 app.use(cors());
+app.use(cookieParser());
+app.use(
+  cors({
+    exposedHeaders: ['X-Total-Count'],
+  })
+);
 app.use('/auth',authRoute)
 app.use('/cart',  cartRoute);
 // app.use('/cart', isAuth(), cartRoute);

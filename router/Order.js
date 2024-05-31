@@ -1,10 +1,15 @@
 const express = require('express');
-const { FetchOrders,CreateOrders } = require('../controller/Order');
+const { FetchAllOrders,createOrder,updateOrder,fetchOrdersByUser,sendMEailOrder } = require('../controller/Order');
 
 const router = express.Router();
 
-router.get('/', FetchOrders)
-.get('/id:')
+router
+.post('/',createOrder)
+.get('/', fetchOrdersByUser)
+// .delete('/:id', deleteOrder)
+.patch('/:id', updateOrder)
+.get('/all',FetchAllOrders)
+.get('/testemail',sendMEailOrder)
       
 
 

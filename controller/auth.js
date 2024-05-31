@@ -4,6 +4,7 @@ const {generateOTP}=require('../services/helper')
 const {sendMail}=require('../services/common')
 const User = require('../model/UserSchema');
 const transporter = require('../services/common');
+const { resetPassworEmailTemplate } = require('../services/emailTemplate');
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
 
 
@@ -91,6 +92,7 @@ exports.createUser = async (req, resp) => {
     try {
       const email = req.body.email;
       const user = await User.findOne({ email });
+      const username=user.name
   
       if (!user) {
         return res.status(404).json({ error: "User not found" });
@@ -102,10 +104,16 @@ exports.createUser = async (req, resp) => {
       await user.save();
   
       const resetPageLink = `http://localhost:3000/reset-password?token=${token}&email=${email}`;
-      const subject = 'Reset password for YingKiong Store';
-      const html = `<p>Click <a href='${resetPageLink}'>here</a> to reset your password</p>`;
+
+      //Send Mail For reset Paswword verification
+    let mailPayload = {
+      to: email,
+      html:resetPassworEmailTemplate(resetPageLink,username) ,
+      subject: 'Reset Password for YingKiong Store',
+    }
   
-      const response = await transporter.sendMail({ to: email, subject, html });
+
+      const response = await transporter.sendMail(mailPayload);
       res.status(200).json({response,message:'Token send to email successfully '});
     } catch (error) {
       console.error("Error requesting password reset:", error);

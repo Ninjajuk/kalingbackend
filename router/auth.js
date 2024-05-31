@@ -3,6 +3,7 @@ const express = require('express');
 const {createUser,logout,getAllUser,loginUser,checkAuth,generateOTP,verifyOtp,resetPasswordRequest,resetPassword}=require('../controller/auth')
 const User = require('../model/UserSchema');
 const { authenticateToken } = require('../middlleware/authenticateToken');
+const { updateUser } = require('../controller/User');
 const router = express.Router();
 
 router.post('/signup',createUser )
@@ -14,6 +15,7 @@ router.post('/signup',createUser )
       .post('/send-otp/',generateOTP)
       .post('/verify-otp',verifyOtp)
       .get('/user',getAllUser)
+      .patch('/:id', updateUser)
 
 
 

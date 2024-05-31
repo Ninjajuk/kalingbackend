@@ -1,3 +1,4 @@
+const { default: mongoose } = require('mongoose');
 const { Cart } = require('../model/CartSchema');
 const jwt = require('jsonwebtoken');
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
@@ -63,9 +64,21 @@ exports.addToCart = async (req, res) => {
 
 exports.deleteFromCart = async (req, res) => {
     const { id } = req.params;
+    // console.log(`Received ID: ${id}`);
+
+        // Validate the ID format
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+          return res.status(400).json({ message: 'Invalid ID format' });
+      }
     try {
-    const doc = await Cart.findByIdAndDelete(id);
-    res.status(200).json(doc);
+      const itemtodelete=await Cart.findById(id)
+
+      if(!itemtodelete){
+        return res.status(404).json({ message: 'Document not found' });
+      }
+      await Cart.findByIdAndDelete(id);
+
+   res.status(200).json({ message: 'Deleted successfully'});
   } catch (err) {
     res.status(400).json(err);
   }
@@ -73,10 +86,14 @@ exports.deleteFromCart = async (req, res) => {
 
 exports.updateCart = async (req, res) => {
   const { id } = req.params;
+  // console.log(id)
   try {
     const cart = await Cart.findByIdAndUpdate(id, req.body, {
       new: true,
     });
+    if (!cart) {
+      return res.status(404).json({ message: 'Cart item not found' });
+    }
     const result = await cart.populate('product');
 
     res.status(200).json(result);

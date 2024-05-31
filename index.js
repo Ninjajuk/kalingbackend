@@ -6,6 +6,7 @@ const {  router:ordersRouter }  = require('./router/Order');
 const {  router:productrouter }  = require('./router/product');
 const {  router:authRoute }  = require('./router/auth');
 const {  router:cartRoute }  = require('./router/Cart');
+const {  router:usersroute }  = require('./router/User');
 const cors = require('cors');
 
 
@@ -26,6 +27,7 @@ app.use(
 );
 app.use('/auth',authRoute)
 app.use('/cart',  cartRoute);
+app.use('/users',  usersroute);
 // app.use('/cart', isAuth(), cartRoute);
 app.use('/orders', ordersRouter);
 app.use('/products', productrouter);
@@ -43,6 +45,7 @@ async function ConnectToDb(){
 ConnectToDb()
 
 app.get('/',(req,resp)=>{
+  document.cookie('User=Samsu')
     resp.send('<h1>Hi Samsu</h1>')
   })
 

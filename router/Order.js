@@ -9,7 +9,7 @@ router
 // .delete('/:id', deleteOrder)
 .patch('/:id', updateOrder)
 .get('/all',FetchAllOrders)
-.get('/testemail',sendMEailOrder)
+// .get('/testemail',sendMEailOrder)
       
 
 

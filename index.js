@@ -45,7 +45,7 @@ async function ConnectToDb(){
 ConnectToDb()
 
 app.get('/',(req,resp)=>{
-  document.cookie('User=Samsu')
+  // document.cookie('User=Samsu')
     resp.send('<h1>Hi Samsu</h1>')
   })
 

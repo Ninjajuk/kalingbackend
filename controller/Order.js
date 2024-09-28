@@ -1,8 +1,4 @@
 
-
-
-
-
 const {Order} = require('../model/OrderSchema');
 const nodemailer = require('nodemailer');
 const User = require('../model/UserSchema');
@@ -60,24 +56,12 @@ const transporter = require('../services/common');
       // console.log('newOrder',newOrder)
    
 
+    // Send emails in parallel to increase performance            to do
      //Send Mail to user
      const user = await User.findById(order.user)
      const userEmail=user.email
      console.log('userEmail',userEmail,orderId,formattedDate)
 
-  //    const userInfo = await sendMail({
-  //     to: userEmail,
-  //     subject: 'Order details',
-  //     text: 'Hi, Please find the order details below.\n\n' +
-  //           `Order ID: ${order.orderId}\n` +
-  //           `Total Items: ${order.totalItems}\n` +
-  //           `Total Amount: $${order.totalAmount}\n`,
-  //     html: `<p>Hi Samsu, Please find the order details below.</p>
-  //            <p>Order ID: ${order.orderId}</p>
-  //            <p>Total Items: ${order.totalItems}</p>
-  //            <p>Total Amount: $${order.totalAmount}</p>`
-
-  // });
 
     //Send Mail to Customer
     let mailPayload = {
@@ -98,7 +82,12 @@ const transporter = require('../services/common');
     });
     const doc = await newOrder.save()
 
+      // Send response immediately
       res.status(201).json({ order: doc, message: 'Order Added Successfully and mail sent' });
+
+      // Use setImmediate to handle email sending asynchronously
+      // setImmediate(() => sendEmailsAsync(order, userEmail));
+      
     } catch (error) {
       console.error('Error occurred:', error);
       res.status(400).json({ message: 'Error occurred, failed to send email' });

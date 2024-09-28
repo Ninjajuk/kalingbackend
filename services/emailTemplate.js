@@ -74,8 +74,8 @@ exports.resetPassworEmailTemplate = (resetPageLink,username) => {
             </tr>
             <tr>
               <td align="center" bgcolor="#ffffff" style="padding: 20px;">
-                <p>Thank you for registering! To complete your registration, please click the link below to verify your email:</p>
-                <a href="${resetPageLink}" style="display: inline-block; cursor: pointer; padding: 12px 24px; background-color: #9333ea; color: #ffffff; text-decoration: none; border-radius: 4px;">Verify Email</a>
+                <p>Please click the link below to reset your password:</p>
+                <a href="${resetPageLink}" style="display: inline-block; cursor: pointer; padding: 12px 24px; background-color: #9333ea; color: #ffffff; text-decoration: none; border-radius: 4px;">Reset Password</a>
                 <p>If you did not sign up for an account, you can ignore this email.</p>
               </td>
             </tr>

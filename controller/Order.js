@@ -221,4 +221,16 @@ const selectedAddress={
       res.status(400).json({ message: 'Error occurred, failed to send email' });
     }
   };
-  
+
+exports.getOrderByOrderId = async (req, res) => {
+  try {
+
+    const { orderId } = req.body
+    if(!orderId) return res.json({message:'orderId should not be empty'})
+    const orderDetails = await Order.find({ orderId })
+    if (orderDetails.length===0) return res.json({ message: "Order with this order id doesnot exists" })
+    res.json(orderDetails)
+  } catch (error) {
+    res.json({ error: error.message })
+  }
+}

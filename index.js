@@ -7,6 +7,7 @@ const {  router:productrouter }  = require('./router/product');
 const {  router:authRoute }  = require('./router/auth');
 const {  router:cartRoute }  = require('./router/Cart');
 const {  router:usersroute }  = require('./router/User');
+const {  router:contactFormroute }  = require('./router/contact');
 const cors = require('cors');
 
 
@@ -18,7 +19,7 @@ const databaseUrl = process.env.DATABASE_URL;
 
 //middlewares
 app.use(express.json());// to parse req.body 
-app.use(cors());
+
 app.use(cookieParser());
 app.use(
   cors({
@@ -31,6 +32,7 @@ app.use('/users',  usersroute);
 // app.use('/cart', isAuth(), cartRoute);
 app.use('/orders', ordersRouter);
 app.use('/products', productrouter);
+app.use('/contact-us', contactFormroute);
 
 
 async function ConnectToDb(){

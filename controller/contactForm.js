@@ -5,7 +5,8 @@ exports.contactForm = async (req, res) => {
     const emailMap = {
         "https://ayahoftruth.site/": "biosamsuddin@gmail.com",
         "http://localhost:8080/contact-us": "biosamsuddin@gmail.com",
-        "website3.com": "support@website3.com"
+        "http://localhost:5173/contact": "biosamsuddin@gmail.com",
+        "https://snapinsta.fun/contact": "biosamsuddin@gmail.com",
     };
 
     const { name, email, message, website } = req.body;
